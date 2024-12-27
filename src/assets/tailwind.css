@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Colors */
+:root {
+    --c-darker: #131515;
+    --c-dark: #1A1D1C;
+    --c-normal: #1E2B26;
+    --c-light: #FFFFFF;
+    --c-hazy-light: #E2E2E2;
+    --c-accent: #17F2FA;
+}
+
+body {
+    padding: 0;
+    height: 0;
+    background-color: var(--c-dark);
+    width: 100vw;
+    height: 100vh;
+}
+
+body #app {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+}
+
+.app-input .app-input-field-wrap {
+    position: relative;
+    background-color: var(--c-normal);
+    border: 1px solid var(--c-normal);
+    box-shadow: inset 2px 2px 5px var(--c-darker);
+    border-radius: 25px;
+    color: var(--c-light);
+    cursor: pointer;
+}
+
+.app-input label span {
+    color: var(--c-hazy-light);
+    padding-left: 15px;
+    cursor: pointer;
+}
+
+.app-input input {
+    position: relative;
+    width: 100%;
+    display: block;
+    background-color: transparent;
+    outline: none;
+}
+
+.app-button {
+    background-color: var(--c-normal);
+    color: var(--c-hazy-light);
+    border-radius: 10px;
+    box-shadow: 4px 4px 5px var(--c-darker);
+    padding: 10px;
+    min-width: 150px;
+    cursor: pointer;
+}
