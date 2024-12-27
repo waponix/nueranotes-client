@@ -1,9 +1,22 @@
 <script lang="ts" setup>
+import { ref, type Ref } from 'vue';
+
 defineProps<{
   id: string,
   type: string,
   label?: string,
 }>()
+
+const emit = defineEmits<{
+    (e: 'value', value: string): void,
+}>()
+
+const value: Ref<string> = ref('');
+
+const pushValue = () => {
+    emit('value', value.value);
+};
+
 </script>
 <template>
     <div class="app-input">
@@ -14,7 +27,15 @@ defineProps<{
                     <slot></slot>
                 </div>
                 <div class="flex-1 app-input-field">
-                    <input :type="type" :name="id" :id="id">
+                    <input 
+                        autocomplete="off"
+                        @blur="pushValue"
+                        @input="pushValue" 
+                        @change="pushValue"
+                        v-model="value" 
+                        :type="type" 
+                        :name="id" 
+                        :id="id">
                 </div>
             </div>
         </label>

@@ -1,17 +1,44 @@
 <script setup lang="ts">
-import Input from '@/components/fields/Input.vue';
-import Button from '@/components/fields/Button.vue';
-import Request from '@/components/api/Request.vue';
+import Input from '@/components/fields/Input.vue'
+import Button from '@/components/fields/Button.vue'
+import Request from '@/components/api/Request.vue'
+import { useProfileStore } from '@/stores/profile'
+import { onMounted, ref, type Ref } from 'vue'
+import router from '@/router'
+
+const email: Ref<string> = ref('')
+const password: Ref<string> = ref('')
+const profileStore = useProfileStore()
+
+const redirector = () => {
+    if (profileStore.isAuthenticated) {
+        router.push({name: 'home'})
+    }
+}
+
+onMounted(() => {
+    redirector()
+})
 </script>
 
 <template>
-    <div class="app-login-form flex flex-col w-full h-full items-center justify-center">
+<Request
+@success="redirector"
+name="auth/login"
+method="post"
+:data="{ email, password }"
+v-slot="request">
+    <form 
+    @submit.prevent="request.send"
+    class="app-login-form flex flex-col w-full h-full items-center justify-center"
+    >
         <div class="min-w-[300px] pb-[20px]">
             <Input 
-                id="username"
+                id="email"
                 type="text"
                 label="Username"
                 class="pb-[10px]"
+                @value="value => email = value"
             >
                 <svg width="42" height="43" viewBox="0 0 42 43" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M14 27.0281C14 23.7765 16.6359 21.1406 19.8875 21.1406H22.1125C25.3641 21.1406 28 23.7765 28 27.0281V27.0281C28 27.841 27.341 28.5 26.5281 28.5H15.4719C14.659 28.5 14 27.841 14 27.0281V27.0281Z" stroke="white" stroke-width="1.5"/>
@@ -22,6 +49,7 @@ import Request from '@/components/api/Request.vue';
                 id="password"
                 type="password"
                 label="Password"
+                @value="value => password = value"
             >
                 <svg width="42" height="43" viewBox="0 0 42 43" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="14" y="17.1471" width="14" height="13.1765" rx="2" stroke="#FFFBFB" stroke-width="1.5"/>
@@ -30,20 +58,11 @@ import Request from '@/components/api/Request.vue';
                 </svg>
             </Input>
         </div>
-        <Request
-            name="auth/login"
-            method="post"
-            :data="{
-                email: 'eric.bermejo.reyes@gmail.com',
-                password: 'Admin123'
-            }"
-            v-slot="request"
-            @response="res => console.log(res)">
-            <Button 
-            id="login"
-            label="Login"
-            :submit="true"
-            @click="request.send()"/>
-        </Request>
-    </div>
+        <Button 
+        id="login"
+        label="Login"
+        :submit="true"
+        @click="request.send"/>
+    </form>
+</Request>
 </template>

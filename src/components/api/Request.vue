@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import axios from 'axios';
-import { useProfileStore } from '@/stores/profile';
+import axios from 'axios'
+import { useProfileStore } from '@/stores/profile'
 
 let props = defineProps<{
   name: string,
@@ -10,32 +10,50 @@ let props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'response', value: object): void
+  (e: 'success', value: any): void
+  (e: 'error', value: any): void
 }>()
 
-let api = axios.create({
+let controller: null|AbortController = null
+
+const abortDuplicateRequest = () => {
+    // prevent any request from being duplicated
+    if (controller !== null) {
+        controller.abort()
+    }
+    controller = new AbortController();
+}
+
+const api = axios.create({
     baseURL: 'http://localhost:8000/api/'
-});
+})
 
-const profileStore = useProfileStore();
+const profileStore = useProfileStore()
 
-api.defaults.headers.common['Authorization'] = profileStore.access;
-api.defaults.headers.common['Accept'] = 'application/json';
+api.defaults.headers.common['Authorization'] = profileStore.access
+api.defaults.headers.common['Accept'] = 'application/json'
 
 const send = async () => {
-    const response: any = await api({
-        method: props.method,
-        url: props.name,
-        data: props.data,
-    });
+    try {
+        abortDuplicateRequest()
 
-    const status: number = Number(response.status);
-    if ([200, 201].includes(status) === false) {
-        emit('response', response.response.data);
-        return;
+        const response: any = await api({
+            method: props.method,
+            url: props.name,
+            data: props.data,
+            // @ts-ignore
+            signal: controller.signal
+        })
+
+        // store token when found
+        if (typeof response.data?.data?.token !== undefined) {
+            profileStore.$state.access = response.data?.data?.token
+        }
+
+        emit('success', response.data)
+    } catch (error: any) {
+        emit('error', error.response)
     }
-
-    emit('response', response.data);
 }
 </script>
 <template>

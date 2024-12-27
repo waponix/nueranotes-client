@@ -1,10 +1,14 @@
-import { ref, computed } from 'vue'
+import { ref, computed, type Ref, type ComputedRef } from 'vue'
 import { defineStore } from 'pinia'
 
 export const useProfileStore = defineStore('profile', () => {
-  let access: null|string = null; 
+  const access: Ref<null|string> = ref(null);
+  const isAuthenticated: ComputedRef<boolean> = computed(() => access.value !== null);
   
-  return { 
-    access
+  return {
+    access,
+    isAuthenticated,
   }
+}, {
+  persist: true
 })
