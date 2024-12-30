@@ -7,7 +7,15 @@ export default {
   ],
   theme: {
     extend: {
-      
+      colors: {
+        darker: 'var(--c-darker)',
+        dark: 'var(--c-dark)',
+        normal: 'var(--c-normal)',
+        light: 'var(--c-light)',
+        "hazy-light": 'var(--c-hazy-light)',
+        accent: 'var(--c-accent)',
+        danger: 'var(--c-danger)',
+      }
     },
   },
   plugins: [],
