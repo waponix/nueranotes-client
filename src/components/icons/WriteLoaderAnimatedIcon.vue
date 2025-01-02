@@ -8,18 +8,18 @@ const props = defineProps<{
     background?: string,
 }>()
 
-const fill: ComputedRef<[string]> = computed(() => {
+const fill: ComputedRef<string> = computed(() => {
     // @ts-ignore
     return iconConfig.fills[props.color || 'default']
 })
 
-const backgroundFill: ComputedRef<[string]> = computed(() => {
+const backgroundFill: ComputedRef<string> = computed(() => {
     // @ts-ignore
     return iconConfig.fills[props.color || 'dark']
 })
 
 
-const stroke: ComputedRef<[string]> = computed(() => {
+const stroke: ComputedRef<string> = computed(() => {
     // @ts-ignore
     return iconConfig.strokes[props.color || 'default']
 })
@@ -33,8 +33,8 @@ const stroke: ComputedRef<[string]> = computed(() => {
 </template>
 <style scoped>
 .pencil, .pencil-bg {
-    animation: movepencil 1.5s infinite;
-    animation-timing-function: ease-out;
+    animation: movepencil 2s infinite;
+    animation-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 @keyframes movepencil {

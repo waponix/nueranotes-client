@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { nextTick, onMounted, ref, type Ref } from 'vue'
+import { computed, nextTick, onMounted, ref, type ComputedRef, type Ref } from 'vue'
+import { type TabsType } from '@/components/types'
 
 import BaseLayout from '@/components/layouts/BaseLayout.vue'
 import Tabs from '@/components/Tabs.vue'
@@ -19,23 +20,37 @@ import SweepIcon from '@/components/icons/SweepIcon.vue'
 import WriteLoaderAnimatedIcon from '@/components/icons/WriteLoaderAnimatedIcon.vue'
 
 import { useNoteStore } from '@/stores/notes'
-import router from '@/router'
+
+const tabs: ComputedRef<TabsType[]> = computed(() => [
+    {
+        active: false,
+        id: 'foo',
+        name: 'User Credentials',
+        url: '/',
+    },
+    {
+        active: false,
+        id: 'foo',
+        name: 'My To Do\'s for the year 2025',
+        url: '/',
+    }
+])
 
 const noteStore = useNoteStore()
+let data = noteStore.generalConvo
+let token = noteStore.generalToken
 
-const searchError: Ref<null|string> = ref(null) 
 const userInput: Ref<string> = ref('')
 
 const parseResponse = (response: any) => {
     // @ts-ignore
-    noteStore.generalConvo.push(...[{
+    data.push(...[{
         role: 'user',
         content: userInput.value,
     }, {
         role: 'assistant',
         content: response.data.answer,
     }])
-
     noteStore.generalToken = response.data.token
     
     showConvoLoader.value = false
@@ -68,58 +83,28 @@ const sendQuery = (request: any) => {
     }, 250)
 }
 
-const openNewNoteTab = () => {
-    noteStore.openTab({
-        id: 'untitled',
-        name: 'Untitled',
-        url: '/note/untitled',
-    })
-
-    router.push('/note/untitled')
-}
-
-const clearConvo = () => {
-    noteStore.clearGeneralConvo()
-}
-
 onMounted(async() => {
+    showPageLoader.value = true
     await nextTick()
     scrollToBottom()
+    showPageLoader.value = false
 })
+
+const showPageLoader: Ref<boolean> = ref(true)
 
 </script>
 
 <template>
     <BaseLayout>
         <template v-slot:header>
-            <Tabs/>
+            <Tabs :tabs="tabs"/>
         </template>
         <template v-slot:left-content>
             <div class="flex flex-col w-[70vw] px-[25px] mt-[25px]">
-                <!-- search field and action buttons -->
-                <div class="app-action-box flex items-center flex-initial w-full">
-                    <InputIcon
-                    id="app-note-search"
-                    :error="searchError"
-                    class="max-w-[400px]"
-                    >
-                        <SearchIcon />
-                    </InputIcon>
-                    <div class="app-action-buttons flex flex-initial px-[25px]">
-                        <a @click.prevent="openNewNoteTab" href="">
-                            <PlusIcon />
-                        </a>
-                        <a @click.prevent href="">
-                            <PinIcon />
-                        </a>
-                        <a @click.prevent href="">
-                            <StarIcon />
-                        </a>
-                    </div>
-                </div>
-                 <!-- main content -->
-                <div class="flex-1 grid gap-[25px] grid-cols-3 pt-[25px]">
-                    
+                <div
+                v-if="showPageLoader" 
+                class="flex flex-1 justify-center items-center">
+                    <WriteLoaderAnimatedIcon />
                 </div>
             </div>
         </template>
@@ -130,7 +115,7 @@ onMounted(async() => {
                 <PerfectScrollbar 
                 id="app-ai-convo" 
                 class="flex-initial max-h-[76vh] flex flex-col text-[14px] pr-[10px] overflow-x-hidden">
-                    <Convo :data="noteStore.generalConvo" />
+                    <Convo :data="data" />
                     <div v-if="userInput" class="mb-[20px]">
                         <span
                         style="white-space: pre-line" 
@@ -148,7 +133,7 @@ onMounted(async() => {
                 name="assistant/notes/query"
                 :data="{
                     query: userInput,
-                    token: noteStore.generalToken
+                    token,
                 }"
                 method="POST"
                 v-slot="request">
@@ -161,7 +146,7 @@ onMounted(async() => {
                     class="flex-initial"
                     placeholder="Need assistance? Ask away!">
                         <a
-                        @click.prevent="clearConvo" 
+                        @click.prevent 
                         href="">
                             <SweepIcon />
                         </a>

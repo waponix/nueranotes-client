@@ -27,30 +27,6 @@ body #app {
     height: 100vh;
 }
 
-.app-input .app-input-field-wrap {
-    position: relative;
-    background-color: var(--c-normal);
-    box-shadow: inset 2px 2px 5px var(--c-darker);
-    border-radius: 25px;
-    color: var(--c-light);
-    cursor: pointer;
-    overflow-x: hidden;
-}
-
-.app-input label span {
-    color: var(--c-hazy-light);
-    padding-left: 15px;
-    cursor: pointer;
-}
-
-.app-input input {
-    position: relative;
-    width: 100%;
-    display: block;
-    background-color: transparent;
-    outline: none;
-}
-
 .app-button {
     background-color: var(--c-normal);
     color: var(--c-hazy-light);
@@ -67,4 +43,12 @@ input:-webkit-autofill:hover,
 input:-webkit-autofill:focus, 
 input:-webkit-autofill:active{
     -webkit-box-shadow: 0 0 0 30px var(--c-normal) inset !important;
+}
+
+.ps__thumb-y {
+    background-color: var(--c-normal) !important;
+}
+
+.ps__rail-y {
+    background-color: transparent !important;
 }

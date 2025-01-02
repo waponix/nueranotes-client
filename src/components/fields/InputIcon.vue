@@ -1,13 +1,14 @@
 <script lang="ts" setup>
 import { computed, ref, type ComputedRef, type Ref } from 'vue';
 
-import ExclamationIconSm from '../icons/ExclamationIconSm.vue';
+import ExclamationIconS from '../icons/ExclamationIconSm.vue';
 
 const props = defineProps<{
   id: string,
   type?: string,
   label?: string,
   error?: null|string,
+  placeholder?: string,
   lock?: boolean,
 }>()
 
@@ -54,13 +55,14 @@ const inputFieldClass: ComputedRef<string[]> = computed(() => {
                         :type="type ? type : 'text'" 
                         :name="id" 
                         :diabled="lock"
-                        :id="id">
+                        :id="id"
+                        :placeholder="placeholder">
                 </div>
             </div>
         </label>
         <div v-if="error !== null" class="app-input-error text-danger flex flex-cols items-center">
             <span class="flex-initial">
-                <ExclamationIconSm color="danger" />
+                <ExclamationIconS color="danger" />
             </span>
             <span class="flex-1">
                 {{ error }}

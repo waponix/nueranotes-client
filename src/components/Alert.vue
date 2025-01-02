@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import ExclamationIconSs from './icons/ExclamationIconS.vue';
+import ExclamationIconSm from './icons/ExclamationIconSm.vue';
 
 defineProps<{
     message: string,
@@ -10,7 +10,7 @@ defineProps<{
     <div class="text-dark flex justify-center w-[100%] px-5 bg-danger">
         <div class="flex items-center">
             <span class="flex-initial">
-                <ExclamationIconSs color="dark"/>
+                <ExclamationIconSm color="dark"/>
             </span>
             <span>
                 {{ message }}

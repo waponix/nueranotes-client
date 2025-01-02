@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Input from '@/components/fields/Input.vue'
+import InputIcon from '@/components/fields/InputIcon.vue'
 import Button from '@/components/fields/Button.vue'
 import Request from '@/components/api/Request.vue'
 import Alert from '@/components/Alert.vue'
@@ -37,12 +37,12 @@ const login = (request: any) => {
     passwordError.value = null
     
     if (email.value === '') {
-        emailError.value = 'This field is required'
+        emailError.value = 'This info is needed'
         submitFlag = false
     }
 
     if (password.value === '') {
-        passwordError.value = 'This field is required'
+        passwordError.value = 'This info is needed'
         submitFlag = false
     }
 
@@ -56,7 +56,7 @@ const loginError = (error: any) => {
     showLoader.value = false
 
     if (typeof(error.data?.error?.email) !== 'undefined') {
-        emailError.value = 'Invalid email address'
+        emailError.value = 'This is not a valid e-mail'
         return
     }
 
@@ -93,16 +93,16 @@ v-slot="request">
     >
         <div class="min-w-[300px] pb-[20px]">
             <Alert v-if="showAlert" class="mb-[20px]" :message="alertError"/>
-            <Input 
+            <InputIcon 
                 id="email"
-                label="Username"
+                label="E-mail (username)"
                 class="pb-[10px]"
                 :error="emailError"
                 @value="value => email = value"
             >
                 <PersonIcon />
-            </Input>
-            <Input 
+            </InputIcon>
+            <InputIcon 
                 id="password"
                 type="password"
                 label="Password"
@@ -110,7 +110,7 @@ v-slot="request">
                 @value="value => password = value"
             >
                 <LockIcon />
-            </Input>
+            </InputIcon>
         </div>
         <Button 
         id="login"

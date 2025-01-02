@@ -7,12 +7,12 @@ const props = defineProps<{
     color?: string,
 }>()
 
-const fill: ComputedRef<[string]> = computed(() => {
+const fill: ComputedRef<string> = computed(() => {
     // @ts-ignore
     return iconConfig.fills[props.color || 'default']
 })
 
-const stroke: ComputedRef<[string]> = computed(() => {
+const stroke: ComputedRef<string> = computed(() => {
     // @ts-ignore
     return iconConfig.strokes[props.color || 'default']
 })
