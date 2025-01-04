@@ -2,10 +2,13 @@
 import axios from 'axios'
 import { useProfileStore } from '@/stores/profile'
 import router from '@/router';
+import { onMounted, ref, type Ref } from 'vue';
 
 const props = defineProps<{
   name: string,
   method?: string,
+  sendOnMount?: boolean,
+  delay?: number,
   data?: object,
   headers?: [{key: any, value: any}],
 }>()
@@ -15,7 +18,7 @@ const emit = defineEmits<{
   (e: 'error', value: any): void
 }>()
 
-let delay: number = 200;
+let delay: Ref<number> = ref(props.delay || 200)
 let timeout: any = null
 
 let controller: null|AbortController = null
@@ -95,8 +98,12 @@ const send = async () => {
                 router.push({name: 'login'})
             }
         }
-    }, delay)
+    }, delay.value)
 }
+
+onMounted(async() => {
+    if (props.sendOnMount) await send()
+})
 </script>
 <template>
     <slot :send="send"></slot>

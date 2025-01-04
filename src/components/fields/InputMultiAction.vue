@@ -11,6 +11,10 @@ const emit = defineEmits <{
 
 const value: Ref<string> = ref('')
 
+const clear = () => {
+    value.value = '';
+}
+
 </script>
 <template>
     <div class="app-input-multi-action">
@@ -26,7 +30,7 @@ const value: Ref<string> = ref('')
         :placeholder="placeholder"></textarea>
         <div class="flex flex-row-reverse">
             <div class="flex">
-                <slot></slot>
+                <slot :clear="clear"></slot>
             </div>
         </div>
     </div>

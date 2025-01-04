@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, type ComputedRef } from 'vue'
+import { computed, ref, type ComputedRef, type Ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useNoteStore } from '@/stores/notes'
 
@@ -18,6 +18,8 @@ const props = defineProps<{
 }>()
 
 const noteStore = useNoteStore()
+
+const forwarder: Ref<string> = ref(`/forward?to=${props.url}`)
 
 const classes: ComputedRef<string[]> = computed(() => {
     let classes = []
@@ -55,7 +57,7 @@ const closeTab = (id: any) => {
             // @ts-ignore
             url = noteStore.openedTabs[tabCount - 1].url
         }
-        router.push(url)
+        router.push({name: 'forward', query: {to: url}})
     }
 }
 </script>
@@ -74,7 +76,7 @@ class="app-tab block h-full relative text-[12px] text-hazy-light z-1 pr-[5px]">
     class="absolute right-[-10px] bottom-[-1px] z-2"/>
     <RouterLink 
     :id="`app-tab-link-${id}`" 
-    :to="url"
+    :to="forwarder"
     class="relative flex items-center justify-center h-full z-1">
         <div v-if="id === '--home'"
         class="flex justify-center"

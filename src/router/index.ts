@@ -21,8 +21,18 @@ const router = createRouter({
     {
       path: '/note/untitled',
       name: 'create_note',
-      component: () => import('../views/Note.vue'),
+      component: () => import('../views/NoteView.vue'),
     },
+    {
+      path: '/note/:id',
+      name: 'update_note',
+      component: () => import('../views/NoteView.vue'),
+    },
+    {
+      path: '/forward',
+      name: 'forward',
+      component: () => import('../views/ForwardView.vue')
+    }
   ],
 })
 
