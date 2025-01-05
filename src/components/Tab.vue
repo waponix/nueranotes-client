@@ -65,7 +65,7 @@ const closeTab = (id: any) => {
 <label 
 :for="`app-tab-link-${id}`" 
 :class="classes"
-class="app-tab block h-full relative text-[12px] text-hazy-light z-1 pr-[5px]">
+class="app-tab block h-full relative text-[12px] text-hazy-light z-1 pr-[5px] text-nowrap shrink-1 flex-initial">
     <TabConvexLeft 
     v-if="active" 
     color="dark"
@@ -86,7 +86,7 @@ class="app-tab block h-full relative text-[12px] text-hazy-light z-1 pr-[5px]">
         <span v-else>{{ name }}</span>
         <a
         class="hover:bg-dark rounded-[10px] ml-[10px]" 
-        @click.prevent="closeTab(id)" v-if="id !== '--home'" 
+        @click.stop.prevent="closeTab(id)" v-if="id !== '--home'" 
         href="">
             <CloseIconSm />
         </a>

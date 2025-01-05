@@ -15,7 +15,7 @@ const fill: ComputedRef<string> = computed(() => {
 
 const backgroundFill: ComputedRef<string> = computed(() => {
     // @ts-ignore
-    return iconConfig.fills[props.color || 'dark']
+    return iconConfig.fills[props.background || 'dark']
 })
 
 

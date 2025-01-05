@@ -4,18 +4,8 @@ import { type TabsType } from '@/components/types'
 
 import BaseLayout from '@/components/layouts/BaseLayout.vue'
 import Tabs from '@/components/Tabs.vue'
-import Request from '@/components/api/Request.vue'
-import Convo from '@/components/Convo.vue'
 import Editor from '@/components/Editor.vue'
 import AssistantChatbox from '@/components/AssistantChatbox.vue'
-
-import InputIcon from '@/components/fields/InputIcon.vue'
-import InputMultiAction from '@/components/fields/InputMultiAction.vue'
-
-import SearchIcon from '@/components/icons/SearchIcon.vue'
-import PlusIcon from '@/components/icons/PlusIcon.vue'
-import PinIcon from '@/components/icons/PinIcon.vue'
-import StarIcon from '@/components/icons/StarIcon.vue'
 
 const tabs: ComputedRef<TabsType[]> = computed(() => [
     {
@@ -46,6 +36,18 @@ onMounted(async() => {
 })
 
 const showPageLoader: Ref<boolean> = ref(true)
+const editorContent: Ref<string> = ref('')
+const editorTitle: Ref<string> = ref('')
+
+// @ts-ignore
+const getContents = ([title, content]) => {
+    editorContent.value = content;
+    editorTitle.value = title;
+}
+
+const noteContents: ComputedRef<string> = computed(() => {
+    return `[Title: ${editorTitle.value}]\n[Content: ${editorContent.value}]`
+})
 
 </script>
 
@@ -57,11 +59,17 @@ const showPageLoader: Ref<boolean> = ref(true)
         <template v-slot:left-content>
             <div class="flex flex-col w-[70vw] pl-[25px] pr-[10px] mt-[25px]">
                 <!-- Note Editor -->
-                 <Editor/>
+                 <Editor
+                 @update="getContents"
+                 />
             </div>
         </template>
         <template v-slot:right-content>
-            <AssistantChatbox/>
+            <AssistantChatbox
+            :role="2"
+            :shared-note="noteContents"
+            placeholder="Let's brainstorm!"
+            />
         </template>
     </BaseLayout>
 </template>

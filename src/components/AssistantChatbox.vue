@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { nextTick, onMounted, ref, type Ref } from 'vue'
+import { nextTick, onMounted, ref, type Ref, type ComputedRef, computed } from 'vue'
+import router from '@/router'
 
 import Request from '@/components/api/Request.vue'
 import Convo from '@/components/Convo.vue'
@@ -13,20 +14,77 @@ import WriteLoaderAnimatedIcon from '@/components/icons/WriteLoaderAnimatedIcon.
 
 import { useNoteStore } from '@/stores/notes'
 
+const props = defineProps<{
+    placeholder: string,
+    sharedNote?: string,
+    role: number,
+}>()
+
 const noteStore = useNoteStore()
 
-const searchError: Ref<null|string> = ref(null) 
 const userInput: Ref<string> = ref('')
 
-const parseResponse = (response: any) => {
-    // @ts-ignore
-    noteStore.generalConvo.push({
-        role: 'assistant',
-        content: response.data.answer,
-    })
+const getNoteId = () => {
+    return router.currentRoute.value.params?.id ?? null;
+}
 
-    noteStore.generalToken = response.data.token
+const parseResponse = (response: any) => {
+    const id = getNoteId()
+    if (id !== null) {
+        // @ts-ignore
+        let tabConvo = noteStore.tabs[id].convo || []
+        // @ts-ignore
+        tabConvo.push({
+            role: 'assistant',
+            content: response.data.answer,
+        })
+        // @ts-ignore
+        noteStore.tabs[id].convo = tabConvo
+        convo.value = tabConvo
+        // @ts-ignore
+        noteStore.tabs[id].token = response.data.token 
+    } else {
+        // @ts-ignore
+        noteStore.generalConvo.push({
+            role: 'assistant',
+            content: response.data.answer,
+        })
+
+        convo.value = noteStore.generalConvo
+
+        noteStore.generalToken = response.data.token
+    }
     
+    
+    showConvoLoader.value = false
+    setTimeout(() => {
+        userInput.value = ''
+        scrollToBottom()
+    }, 250)
+}
+
+const failedResponse = async(response: any) => {
+    const id = getNoteId()
+
+    if (id !== null) {
+        // @ts-ignore
+        let tabConvo = noteStore.tabs[id]?.convo || []
+        // @ts-ignore
+        tabConvo.push({
+            role: 'assistant',
+            content: 'Sorry, I am unable to make a response at this moment, please try again.',
+        })
+        // @ts-ignore
+        noteStore.tabs[id].convo = tabConvo
+        convo.value = tabConvo
+    } else {
+        // @ts-ignore
+        noteStore.generalConvo.push({
+            role: 'assistant',
+            content: 'Sorry, I am unable to make a response at this moment, please try again.',
+        });
+        convo.value = noteStore.generalConvo
+    }
     showConvoLoader.value = false
     setTimeout(() => {
         userInput.value = ''
@@ -54,24 +112,63 @@ const sendQuery = (request: any, field: any) => {
     setTimeout(() => {
         scrollToBottom()
     }, 250)
-    // @ts-ignore
-    noteStore.generalConvo.push({
-        role: 'user',
-        content: userInput.value,
-    })
+    
+
+    const id = getNoteId()
+    if (id !== null) {
+        // @ts-ignore
+        let tabConvo = noteStore.tabs[id]?.convo || []
+        // @ts-ignore
+        tabConvo.push({
+            role: 'user',
+            content: userInput.value,
+        })
+        // @ts-ignore
+        noteStore.tabs[id].convo = tabConvo
+        convo.value = tabConvo
+    } else {
+        // @ts-ignore
+        noteStore.generalConvo.push({
+            role: 'user',
+            content: userInput.value,
+        })
+        convo.value = noteStore.generalConvo
+    }
+
     field.clear()
 }
 
 const clearConvo = () => {
-    noteStore.clearGeneralConvo()
+    const id = getNoteId()
+    if (id !== null) {
+        // @ts-ignore
+        noteStore.tabs[id].convo = []
+        // @ts-ignore
+        noteStore.tabs[id].token = null
+    } else {
+        noteStore.clearGeneralConvo()
+    }
+
+    convo.value = [];
+    
     setTimeout(() => {
         scrollToTop()
     }, 250)
 }
 
+const convo: Ref<any> = ref([])
+
 onMounted(async() => {
     await nextTick()
     scrollToBottom()
+
+    const id = getNoteId()
+    if (getNoteId() !== null) {
+        // @ts-ignore
+        convo.value = noteStore.tabs[id].convo || [];
+    } else {
+        convo.value = noteStore.generalConvo;
+    }
 })
 
 </script>
@@ -82,7 +179,7 @@ onMounted(async() => {
     <PerfectScrollbar 
     id="app-ai-convo" 
     class="flex-initial max-h-[76vh] flex flex-col text-[14px] pr-[15px] overflow-x-hidden">
-        <Convo :data="noteStore.generalConvo" />
+        <Convo :data="convo" />
         <div v-if="showConvoLoader" class="pb-[20px] flex justify-center items-end text-hazy-light">
             <WriteLoaderAnimatedIcon class="mr-[5px]"/>
             <span>just a moment...</span>
@@ -90,10 +187,13 @@ onMounted(async() => {
     </PerfectScrollbar>
     <Request
     @success="parseResponse"
+    @error="failedResponse"
     name="assistant/notes/query"
     :data="{
         query: userInput,
-        token: noteStore.generalToken
+        token: noteStore.generalToken,
+        role: role,
+        note: sharedNote,
     }"
     method="POST"
     v-slot="request">
@@ -104,15 +204,15 @@ onMounted(async() => {
         }"
         id="question"
         class="flex-initial mr-[15px]"
-        placeholder="Looking for something? Ask away!"
+        :placeholder="placeholder"
         v-slot="field">
             <a
-            @click.prevent="clearConvo" 
+            @click.prevent.stop="clearConvo" 
             href="">
                 <SweepIcon />
             </a>
             <a
-            @click.prevent="sendQuery(request, field)" 
+            @click.prevent.stop="sendQuery(request, field)" 
             href="">
                 <SendIcon />
             </a>

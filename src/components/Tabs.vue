@@ -22,7 +22,7 @@ const tabs: ComputedRef<TabsType[]> = computed(() => [
 <template>
     <div 
     id="app-tabs"
-    class="flex items-center">
+    class="flex items-center overflow-hidden w-full">
         <Tab 
         v-for="tab of tabs" 
         :active="tab.active"

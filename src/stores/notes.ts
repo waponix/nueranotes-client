@@ -20,6 +20,12 @@ export const useNoteStore = defineStore('notes', () => {
 
   const openTab = (tab: any) => {
     // @ts-ignore
+    if (typeof(tabs.value[tab.id]) !== 'undefined') {
+      // @ts-ignore
+      tabs.value[tab.id] = {...tabs.value[tab.id], ...tab}
+      return
+    }
+    // @ts-ignore
     tabs.value[tab.id] = tab
   }
 
@@ -32,6 +38,17 @@ export const useNoteStore = defineStore('notes', () => {
     generalToken.value = null
     generalConvo.value = []
   }
+
+  const updateTabContent = (id: string, tab: any) => {
+    // @ts-ignore
+    if (typeof tabs.value[id] === 'undefined') {
+      // @ts-ignore
+      tabs.value[id] = {}
+    }
+
+    // @ts-ignore
+    tabs.value[id] = {...tabs.value[id], ...tab}
+  }
   
   return {
     generalToken,
@@ -41,6 +58,7 @@ export const useNoteStore = defineStore('notes', () => {
     openTab,
     closeTab,
     clearGeneralConvo,
+    updateTabContent,
   }
 }, {
   persist: true
