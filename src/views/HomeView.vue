@@ -114,7 +114,7 @@ onMounted(async() => {
                  <!-- main content -->
                 <PerfectScrollbar
                 :class="classes"
-                class="flex-auto grid gap-[25px] grid-rows-auto max-h-[87vh] grid-cols-3 pr-[15px]">
+                class="flex-initial flex max-h-[86vh] flex-wrap">
                     <Request
                     name="notes"
                     v-slot="request"
@@ -130,6 +130,7 @@ onMounted(async() => {
                     :starred="note.starred"
                     :created-at="note.created_at"
                     :updated-at="note.updated_at"
+                    class="flex-initial mb-[25px] mr-[25px] w-[calc(33.33%-25px)]"
                     />
                 </PerfectScrollbar>
             </div>
@@ -137,7 +138,7 @@ onMounted(async() => {
         <template v-slot:right-content>
             <AssistantChatbox
             :role="1"
-            placeholder="Looking for something? Ask away!"/>
+            placeholder="Need something? Ask away!"/>
         </template>
     </BaseLayout>
 </template>

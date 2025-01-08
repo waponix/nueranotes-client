@@ -65,7 +65,7 @@ const closeTab = (id: any) => {
 <label 
 :for="`app-tab-link-${id}`" 
 :class="classes"
-class="app-tab block h-full relative text-[12px] text-hazy-light z-1 pr-[5px] text-nowrap shrink-1 flex-initial">
+class="app-tab block h-full relative text-[14px] text-hazy-light z-1 pr-[5px] text-nowrap shrink-1 flex-initial">
     <TabConvexLeft 
     v-if="active" 
     color="dark"

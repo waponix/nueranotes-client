@@ -53,11 +53,11 @@ let tries: number = 0;
 
 const send = async () => {
     avoidDuplicate()
+    abortDuplicateRequest()
+    api.defaults.headers.common['Authorization'] = `Bearer ${profileStore.access}`
     
     timeout = setTimeout(async () => {
         try {
-            abortDuplicateRequest()
-
             const response: any = await api({
                 method: props.method,
                 url: props.name,
@@ -72,6 +72,7 @@ const send = async () => {
             }
 
             emit('success', response.data)
+            return
         } catch (error: any) {
             if (Number(error.status) === 401 && tries < retry) {
                 try {
@@ -97,6 +98,7 @@ const send = async () => {
             if (Number(error.status) === 401 && tries >= retry) {
                 router.push({name: 'login'})
             }
+            return
         }
     }, delay.value)
 }

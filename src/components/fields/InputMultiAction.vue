@@ -18,7 +18,7 @@ const clear = () => {
 </script>
 <template>
     <div class="app-input-multi-action">
-        <textarea 
+        <input 
         :id="id" 
         :name="id" 
         v-model="value" 
@@ -27,7 +27,9 @@ const clear = () => {
         @change="() => emit('value', value)"
         autocomplete="off"
         rows="1"
-        :placeholder="placeholder"></textarea>
+        :placeholder="placeholder"
+        class="w-full bg-transparent px-[20px] pt-[20px] outline-0 text-light"
+        />
         <div class="flex flex-row-reverse">
             <div class="flex">
                 <slot :clear="clear"></slot>

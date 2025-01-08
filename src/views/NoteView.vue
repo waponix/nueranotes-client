@@ -6,7 +6,9 @@ import BaseLayout from '@/components/layouts/BaseLayout.vue'
 import Tabs from '@/components/Tabs.vue'
 import Editor from '@/components/Editor.vue'
 import AssistantChatbox from '@/components/AssistantChatbox.vue'
+import router from '@/router'
 
+// @ts-ignore
 const tabs: ComputedRef<TabsType[]> = computed(() => [
     {
         active: false,
@@ -68,7 +70,7 @@ const noteContents: ComputedRef<string> = computed(() => {
             <AssistantChatbox
             :role="2"
             :shared-note="noteContents"
-            placeholder="Let's brainstorm!"
+            placeholder="Send your thoughts"
             />
         </template>
     </BaseLayout>

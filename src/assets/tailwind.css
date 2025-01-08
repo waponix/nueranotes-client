@@ -6,7 +6,8 @@
 :root {
     --c-darker: #131515;
     --c-dark: #1A1D1C;
-    --c-normal: #1E2B26;
+    /* --c-normal: #1E2B26; */
+    --c-normal: #182D26;
     --c-light: #FFFFFF;
     --c-hazy-light: #E2E2E2;
     --c-accent: #17F2FA;
@@ -45,10 +46,10 @@ input:-webkit-autofill:active{
     -webkit-box-shadow: 0 0 0 30px var(--c-normal) inset !important;
 }
 
-.ps__thumb-y {
+.ps__thumb-y, .ps__thumb-x {
     background-color: var(--c-normal) !important;
 }
 
-.ps__rail-y {
+.ps__rail-y, .ps__rail-x {
     background-color: transparent !important;
 }

@@ -7,12 +7,14 @@ import { useNoteStore } from '@/stores/notes'
 
 const noteStore = useNoteStore()
 
+// @ts-ignore
 const tabs: ComputedRef<TabsType[]> = computed(() => [
     {
         active: router.currentRoute.value.name === 'home',
         id: '--home',
         url: '/',
         name: '',
+        open: true,
     },
     // @ts-ignore
     ...noteStore.openedTabs
@@ -23,11 +25,13 @@ const tabs: ComputedRef<TabsType[]> = computed(() => [
     <div 
     id="app-tabs"
     class="flex items-center overflow-hidden w-full">
-        <Tab 
-        v-for="tab of tabs" 
-        :active="tab.active"
-        :name="tab.name"
-        :id="tab.id"
-        :url="tab.url"/>
+        <template v-for="tab of tabs" >
+            <Tab 
+            v-if="tab.open"
+            :active="tab.active"
+            :name="tab.name"
+            :id="tab.id"
+            :url="tab.url"/>
+        </template>
     </div>
 </template>
