@@ -9,6 +9,7 @@ const props = defineProps<{
   label?: string,
   error?: null|string,
   placeholder?: string,
+  value?: string,
   lock?: boolean,
 }>()
 
@@ -16,7 +17,7 @@ const emit = defineEmits<{
     (e: 'value', value: string): void,
 }>()
 
-const value: Ref<string> = ref('');
+const value: Ref<string> = ref(props.value ?? '');
 
 const pushValue = () => {
     emit('value', value.value);

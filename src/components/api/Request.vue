@@ -96,6 +96,7 @@ const send = async () => {
             emit('error', error.response)
 
             if (Number(error.status) === 401 && tries >= retry) {
+                profileStore.access = null;
                 router.push({name: 'login'})
             }
             return

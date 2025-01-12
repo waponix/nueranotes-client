@@ -24,6 +24,7 @@ const noteCacheStore = useNoteCacheStore()
 
 const notes: Ref<any> = ref([])
 
+const search: Ref<string> = ref('')
 const searchError: Ref<null|string> = ref(null)
 
 const scrollToBottom = () => {
@@ -46,9 +47,24 @@ const loadNotes = (response: any) => {
     showLoader.value = false
     notes.value = response.data
     noteCacheStore.noteList = notes.value
+    loadingMessage.value = defaultLoadingMessage
 }
 
 const showLoader: Ref<boolean> = ref(false)
+
+const beginSearch = (request: any) => {
+    showLoader.value = true
+    noteCacheStore.search = search.value
+    if (search.value) {
+        loadingMessage.value = `Looking for "${noteCacheStore.search}" in your notes...`
+    } else {
+        loadingMessage.value = defaultLoadingMessage
+    }
+    request.send()
+}
+
+const defaultLoadingMessage: string = 'Loading your notes...'
+const loadingMessage: Ref<string> = ref(defaultLoadingMessage)
 
 const classes: ComputedRef<string[]> = computed(() => {
     let classes = []
@@ -83,13 +99,24 @@ onMounted(async() => {
             <div class="flex flex-col w-[70vw] pl-[25px] pr-[10px] mt-[25px] overflow-x-visible">
                 <!-- search field and action buttons -->
                 <div class="app-action-box flex items-center flex-initial w-full pb-[20px]">
+                    <Request
+                    @success="loadNotes"
+                    :name="`notes?search=${search}`"
+                    v-slot="request">
+                    <form
+                    @submit.prevent="beginSearch(request)"
+                    class="w-full max-w-[400px]">
                     <InputIcon
+                    @value="(val: string) => search = val"
+                    :value="noteCacheStore.search"
                     id="app-note-search"
                     :error="searchError"
                     class="max-w-[400px]"
                     >
                         <SearchIcon />
                     </InputIcon>
+                    </form>
+                    </Request>
                     <div class="app-action-buttons flex flex-initial px-[25px]">
                         <a @click.prevent="openNewNoteTab" href="">
                             <PlusIcon />
@@ -108,13 +135,18 @@ onMounted(async() => {
                 class="flex-auto w-full h-full flex items-center justify-center text-light">
                     <div class="flex items-end">
                         <WriteLoaderAnimatedIcon />
-                        <span class="ml-[5px]">Loading your notes...</span>
+                        <span class="ml-[5px]">{{ loadingMessage }}</span>
                     </div>
                 </div>
                  <!-- main content -->
                 <PerfectScrollbar
                 :class="classes"
                 class="flex-initial flex max-h-[86vh] flex-wrap">
+                    <div
+                    v-if="noteCacheStore.search"
+                    class="w-full text-hazy-light font-thin text-[14px] mb-[20px] pl-[20px]">
+                        <span>displaying results for "<span class="text-accent font-normal">{{ noteCacheStore.search }}</span>"</span>
+                    </div>
                     <Request
                     name="notes"
                     v-slot="request"

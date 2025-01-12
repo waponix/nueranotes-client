@@ -113,6 +113,7 @@ const sendQuery = (request: any) => {
                     v-if="showLoader" 
                     class="flex justify-center align-center">
                         <WriteLoaderAnimatedIcon 
+                        background="darker"
                         class="my-[50px]"
                         />
                     </div>
@@ -143,6 +144,6 @@ const sendQuery = (request: any) => {
 </template>
 <style scoped>
 .app-editor-toolbox {
-    box-shadow: 0px 0px 10px 5px var(--c-normal);
+    box-shadow: 0px 0px 10px 5px var(--c-hazy-light);
 }
 </style>

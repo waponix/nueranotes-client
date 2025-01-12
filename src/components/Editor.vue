@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed, nextTick, onMounted, ref, type ComputedRef, type Ref } from 'vue'
 import { useNoteStore } from '@/stores/notes'
+import { useNoteCacheStore } from '@/stores/notes_cache'
 import router from '@/router'
 import Request from './api/Request.vue'
 // @ts-ignore
@@ -14,6 +15,7 @@ const untitled = 'untitled'
 const id: Ref<string> = ref(router.currentRoute.value.params?.id?.toString() || untitled)
 
 const noteStore = useNoteStore()
+const noteStoreCache = useNoteCacheStore()
 
 // @ts-ignore
 const title: Ref<string> = ref(noteStore.tabs[id.value]?.['name'] || 'Untitled')
@@ -72,10 +74,11 @@ const emits = defineEmits<{
 }>()
 
 const save = (response: any) => {
+    const data = response.data
+
     if (id.value === untitled) {
         // open new tab for the newly created note,
         // to replace the old one
-        const data = response.data
 
         // @ts-ignore
         const untitledTab = noteStore.tabs[untitled]
@@ -100,6 +103,10 @@ const save = (response: any) => {
         url.value = `notes/${id.value}`
         router.push({name: 'update_note', params: { id: data.id }})
     }
+
+    // update the note list cache
+    // @ts-ignore
+    noteStoreCache.noteList[data.id] = data;
 
     saving.value = false
 }
@@ -141,7 +148,7 @@ const selectedText: Ref<string> = ref('')
 const showTool = (e: Event) => {
     const selection = window.getSelection()
     selectedText.value = selection?.toString() ?? ''
-    toolbox.value.show = selectedText.value !== ''
+    toolbox.value.show = selectedText.value.trim() !== ''
 
     if (selection?.rangeCount ?? 0 > 0) {
         const range = selection?.getRangeAt(0)
@@ -159,15 +166,24 @@ const showTool = (e: Event) => {
     }
 }
 
-const replaceWithAnswer = (answer: string) => {
+const replaceWithAnswer = (answer: string, request: any) => {
     selectionRange.value?.deleteContents()
     selectionRange.value?.insertNode(document.createTextNode(answer))
+    window.getSelection()?.removeAllRanges()
+    // @ts-ignore
+    window.getSelection()?.addRange(selectionRange.value)
     selectionRange.value = null
     selectedText.value = ''
     toolbox.value.show = false
 
     displayContent.value = (document.querySelector('.app-note-editable-content')?.innerHTML ?? displayContent.value).trim()
     content.value = displayContent.value
+    saving.value = true;
+    noteStore.updateTabContent(id.value, {
+        title: title.value,
+        content: content.value,
+    })
+    request.send();
 }
 
 const showToolbox: ComputedRef<boolean> = computed(() => toolbox.value.show)
@@ -229,7 +245,7 @@ onMounted(async() => {
         @success="save"
         :name="url"
         :method="method"
-        :delay="2500"
+        :delay="5000"
         :data="{
             title,
             content,
@@ -237,12 +253,12 @@ onMounted(async() => {
         v-slot="request"
         >
             <div
-            class="flex flex-col app-note-paper bg-normal min-h-full w-full rounded-t-[25px] px-[50px] pb-[100px] text-light">
+            class="flex flex-col app-note-paper bg-hazy-light min-h-full w-full rounded-t-[25px] px-[50px] pb-[100px] text-dark">
                 <!-- Loader animation -->
                 <div
                 v-if="showLoader" 
                 class="flex flex-1 justify-center items-center">
-                    <WriteLoaderAnimatedIcon background="normal"/>
+                    <WriteLoaderAnimatedIcon color="normal" background="hazy-light"/>
                 </div>
                 <!-- Note title -->
                 <span
@@ -255,14 +271,14 @@ onMounted(async() => {
                 @input="(el: Event) => updateTitle(el, request)">
                     {{ displayTitle }}
                 </span>
-                <div v-if="!showLoader" class="sticky top-[0] bg-normal pb-[25px] flex flex-row-reverse">
+                <div v-if="!showLoader" class="sticky top-[0] bg-hazy-light pb-[25px] flex flex-row-reverse">
                     <button 
                     @click.stop="toggleEditor"
-                    class="bg-dark flex-initial hover:bg-darker text-left text-hazy-light pt-[5px] pb-[2.5px] px-[15px] min-w-[150px] rounded-b-[5px]"
+                    class="bg-dark flex-initial hover:bg-gradient-to-b from-dark to-darker text-left text-hazy-light pt-[5px] pb-[2.5px] px-[15px] min-w-[150px] rounded-b-[10px]"
                     >{{ toggleEdit ? 'Preview mode' : 'Edit mode' }}</button>
                     <div class="flex-1"></div>
                     <div v-if="saving" class="app-note-paper-status flex-initial flex items-end">
-                        <WriteLoaderAnimatedIcon background="normal" />
+                        <WriteLoaderAnimatedIcon color="normal" background="hazy-light"/>
                         <span class="pl-[5px]">
                             Saving...
                         </span>
@@ -272,13 +288,13 @@ onMounted(async() => {
                 <Markdown
                 v-if="!showLoader && !toggleEdit"
                 :source="content"
-                class="app-note-content-preview flex-auto prose prose-assistant"
+                class="app-note-content-preview flex-auto prose prose-editor"
                 />
                 <span
                 v-if="!showLoader && toggleEdit"
                 id="app-note-content"
                 style="white-space: pre-line" 
-                class="app-note-editable-content flex-auto text-hazy-light outline-none bg-transparent resize-none"
+                class="app-note-editable-content flex-auto text-dark outline-none bg-transparent resize-none"
                 contenteditable
                 @mouseup="showTool"
                 @input="(el: Event) => updateContent(el, request)"
@@ -292,7 +308,7 @@ onMounted(async() => {
                 </form>
             </div>
             <EditorToolbox 
-            @accept="replaceWithAnswer"
+            @accept="(answer: string) => replaceWithAnswer(answer, request)"
             v-if="showToolbox"
             :top="toolbox.top"
             :left="toolbox.left"

@@ -4,9 +4,11 @@ import router from '@/router';
 
 export const useNoteCacheStore = defineStore('notes_cache', () => {
  const noteList = ref({})
+ const search = ref('')
 
  return {
-  noteList
+  noteList,
+  search,
  }
 }, {
   persist: {
